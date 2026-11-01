@@ -1,0 +1,24 @@
+body {
+    background-color: white;
+    font-family: Arial;
+}
+body{
+    text-align: center;
+}
+	button {
+  background-color: blue; /* Couleur du bouton */
+  color: red;              /* Couleur du texte */
+  border: none;              /* Optionnel */
+  padding: 30px 60px;        /* Optionnel */
+ }
+    button {
+  background-color: black; /* Couleur du bouton */
+  color: white;              /* Couleur du texte */
+  border: none;              /* Optionnel */
+  padding: 30px 60px;        /* Optionnel */
+}
+#monimage {
+    position: absolute;
+    left: 50px;
+    top: 150px;
+}

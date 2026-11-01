@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SACHA - Jeu vidéo</title>
+
+    <link rel="stylesheet" href="Style.css">
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        #monimage {
+            position: fixed;
+            left: 50px;
+            top: 150px;
+            width: 100px;
+            height: auto;
+            z-index: 5;
+        }
+
+        #position {
+            position: fixed;
+            top: 80px;
+            left: 10px;
+            z-index: 20;
+            background: white;
+            padding: 5px;
+        }
+
+        #infos-jeu {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin: 0;
+            z-index: 100;
+            background: white;
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        #infos-jeu h2 {
+            margin: 0;
+        }
+
+        #commandes {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #eeeeee;
+            color: #222222;
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        #score {
+            color: orange;
+        }
+
+        #fond-image {
+            width: 500px;
+            max-width: 100%;
+        }
+
+        button {
+            padding: 8px 12px;
+            margin: 5px;
+            cursor: pointer;
+        }
+
+        #pieces-container {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .piece {
+            position: absolute;
+            font-size: 35px;
+            pointer-events: none;
+            user-select: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>JEU VIDÉO SACHA</h1>
+    <p>HE HE</p>
+
+    <img id="fond-image" src="image1.jpeg" alt="Image du jeu">
+
+    <p id="position">Position : 50, 150</p>
+
+    <div id="infos-jeu">
+        <h2>🪙 Pièces : <span id="score">0</span></h2>
+
+        <div id="commandes">
+            <strong>🎮 Commandes :</strong>
+            <span>1 ⬆️ Haut</span>
+            <span>2 ⬇️ Bas</span>
+            <span>3 ⬅️ Gauche</span>
+            <span>4 ➡️ Droite</span>
+        </div>
+    </div>
+
+    <img id="monimage" src="image2.jpeg" alt="Bonhomme">
+
+    <div id="pieces-container"></div>
+
+    <p id="texte">neuil</p>
+    <button id="bouton-texte">Changer le texte</button>
+    <button id="bouton-michael">Clique ici</button>
+    <button id="bouton-hehe">Clique ici aussi</button>
+
+    <script>
+        // Récupération des éléments
+        const bonhomme = document.getElementById("monimage");
+        const compteur = document.getElementById("score");
+        const positionTexte = document.getElementById("position");
+        const texte = document.getElementById("texte");
+        const piecesContainer = document.getElementById("pieces-container");
+
+        // Position et score de départ
+        let x = 50;
+        let y = 150;
+        let score = 0;
+
+        const vitesse = 20;
+
+        // Boutons
+        document.getElementById("bouton-texte").addEventListener("click", function() {
+            texte.textContent = "sacha prime";
+            texte.style.color = "red";
+        });
+
+        document.getElementById("bouton-michael").addEventListener("click", function() {
+            alert("Michael Jackson");
+        });
+
+        document.getElementById("bouton-hehe").addEventListener("click", function() {
+            alert("He hehe he");
+        });
+
+        // Créer une pièce sans supprimer les précédentes
+        function placerPiece() {
+            const piece = document.createElement("div");
+            piece.classList.add("piece");
+
+            const hasard = Math.random() * 100;
+            let valeurPiece;
+
+            if (hasard < 0.01) {
+                piece.textContent = "🩷";
+                valeurPiece = 500;
+            } else if (hasard < 0.11) {
+                piece.textContent = "🟢";
+                valeurPiece = 200;
+            } else if (hasard < 1.11) {
+                piece.textContent = "🔴";
+                valeurPiece = 50;
+            } else if (hasard < 11.11) {
+                piece.textContent = "🔵";
+                valeurPiece = 20;
+            } else {
+                piece.textContent = "🪙";
+
+                if (score >= 500) {
+                    valeurPiece = 4;
+                } else if (score >= 100) {
+                    valeurPiece = 2;
+                } else {
+                    valeurPiece = 1;
+                }
+            }
+
+            // Position aléatoire dans la fenêtre
+            const maxX = Math.max(0, window.innerWidth - 50);
+            const maxY = Math.max(100, window.innerHeight - 50);
+
+            const pieceX = Math.floor(Math.random() * maxX);
+            const pieceY = Math.floor(
+                100 + Math.random() * Math.max(1, maxY - 100)
+            );
+
+            piece.style.left = pieceX + "px";
+            piece.style.top = pieceY + "px";
+
+            // Mémoriser la valeur de la pièce
+            piece.dataset.valeur = valeurPiece;
+
+            // Ajouter la nouvelle pièce sans toucher aux anciennes
+            piecesContainer.appendChild(piece);
+
+            // Vérifier immédiatement si elle apparaît sous le personnage
+            verifierCollision();
+        }
+
+        // Vérifier toutes les pièces présentes à l'écran
+        function verifierCollision() {
+            const perso = bonhomme.getBoundingClientRect();
+            const pieces = document.querySelectorAll(".piece");
+
+            pieces.forEach(function(piece) {
+                const tresor = piece.getBoundingClientRect();
+
+                if (
+                    perso.left < tresor.right &&
+                    perso.right > tresor.left &&
+                    perso.top < tresor.bottom &&
+                    perso.bottom > tresor.top
+                ) {
+                    score += Number(piece.dataset.valeur);
+                    compteur.textContent = score;
+
+                    // Seule la pièce ramassée disparaît
+                    piece.remove();
+                }
+            });
+        }
+
+        // Déplacement avec les touches 1, 2, 3 et 4
+        document.addEventListener("keydown", function(e) {
+            if (
+                e.target &&
+                (e.target.tagName === "INPUT" ||
+                 e.target.tagName === "TEXTAREA")
+            ) {
+                return;
+            }
+
+            switch (e.key) {
+                case "5":
+                    y -= vitesse;
+                    break;
+                case "2":
+                    y += vitesse;
+                    break;
+                case "1":
+                    x -= vitesse;
+                    break;
+                case "3":
+                    x += vitesse;
+                    break;
+                default:
+                    return;
+            }
+
+            // Empêcher le personnage de sortir de l'écran
+            x = Math.max(
+                0,
+                Math.min(x, window.innerWidth - bonhomme.offsetWidth)
+            );
+
+            y = Math.max(
+                0,
+                Math.min(y, window.innerHeight - bonhomme.offsetHeight)
+            );
+
+            bonhomme.style.left = x + "px";
+            bonhomme.style.top = y + "px";
+
+            positionTexte.textContent = "Position : " + x + ", " + y;
+
+            // Ramasser une pièce uniquement en la touchant
+            verifierCollision();
+        });
+
+        // Une première pièce apparaît immédiatement
+        placerPiece();
+
+        // Une nouvelle pièce apparaît toutes les 3 secondes
+        // Les pièces déjà présentes ne sont jamais supprimées ici
+        setInterval(placerPiece, 1000);
+    </script>
+</body>
+</html>
+
